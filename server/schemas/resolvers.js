@@ -1,5 +1,5 @@
 // importing 
-const { Book, User } = require('../models');
+const { User } = require('../models');
 const { AuthenticationError } = require('apollo-server-express');
 const { signToken } = require('../utils/auth');
 
@@ -26,7 +26,7 @@ const resolvers = {
 
 			return { token, user };
 		},
-		login: async (parent, { email, password }) => {
+		loginUser: async (parent, { email, password }) => {
 			const user = await User.findOne({ email });
 
 			if (!user) {
@@ -46,8 +46,9 @@ const resolvers = {
 			if (context.user) {
 				const updatedUser = await User.findByIdAndUpdate(
 					{ _id: context.user_id },
-					{ $addToSett: { savedBooks: args.bookData } },
-					{ new: true }
+					// takes input type to replace 'body'
+					{ $addToSett: { savedBooks: args.input } },
+					{ new: true, runValidators: true }
 				);
 
 				return updatedUser;
